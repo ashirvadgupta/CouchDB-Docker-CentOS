@@ -1,0 +1,34 @@
+version: '3.3'
+volumes:
+  couch-data:
+services:
+  ldds-web:
+    image: isl-dsdc.ca.com:5000/analytics/ldds:$buildnumber
+    ports:
+      - "18080:8080"
+      - "18443:8443"
+    environment:
+      - LDDSUSERNAME=lddsuser
+      - LDDSHOSTNAME=MASTER_IPADDRESS
+      - LDDSPORTNO=5984
+      - LDDSUSERPWD=interOP@123
+      - INITIAL_HEAPSIZE=512M
+      - MAX_HEAPSIZE=1024M
+    depends_on:
+      - couchdb
+  couchdb:
+    image: isl-dsdc.ca.com:5000/analytics/lddscouchdb:$buildnumber
+    environment:
+      - COUCHDB_COOKIE=sunday
+      - COUCHDB_USER=lddsuser
+      - COUCHDB_PASSWORD=interOP@123
+      - COUCHDB_SECRET=monday
+      - IPADDRESS=MASTER_IPADDRESS
+      - COUCHDBPORTNO=MASTER_COUCHDBPORT
+    ports:
+      - "5984:5984"
+      - "5986:5986"
+      - "4369:4369"
+      - "9100-9200:9100-9200"
+    volumes:
+      - couch-data:/opt/couchdb/data/

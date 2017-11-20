@@ -1,0 +1,21 @@
+version: '3.3'
+volumes:
+  couch-data:
+services:
+  couchdb:
+    image: isl-dsdc.ca.com:5000/analytics/lddscouchdb:$buildnumber
+    ports:
+      - "5984:5984"
+      - "5986:5986"
+      - "4369:4369"
+      - "9100-9200:9100-9200"
+    environment:
+      - IPADDRESS=SLAVENODE2_IPADDRESS
+      - COUCHDB_ADMINPORT=SLAVENODE2_COUCHDBPORT
+      - COUCHDB_COOKIE=sunday
+      - COUCHDB_USER=lddsuser
+      - COUCHDB_PASSWORD=interOP@123
+      - COUCHDB_SECRET=monday
+    volumes:
+      - couch-data:/opt/couchdb/data/
+

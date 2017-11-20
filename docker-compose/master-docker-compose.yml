@@ -1,0 +1,49 @@
+version: '3.3'
+volumes:
+  couch-data:
+services:
+  ldds-web:
+    image: isl-dsdc.ca.com:5000/analytics/ldds:$buildnumber
+    ports:
+      - "18080:8080"
+      - "18443:8443"
+    environment:
+      - LDDSUSERNAME=lddsuser
+      - LDDSHOSTNAME=MASTER_IPADDRESS
+      - LDDSPORTNO=HAPROXY_PORTNO
+      - LDDSUSERPWD=interOP@123
+      - INITIAL_HEAPSIZE=512M
+      - MAX_HEAPSIZE=1024M
+    depends_on:
+      - couchdb
+  couchdb:
+    image: isl-dsdc.ca.com:5000/analytics/lddscouchdb:$buildnumber
+    environment:
+      - COUCHDB_COOKIE=sunday
+      - COUCHDB_USER=lddsuser
+      - COUCHDB_PASSWORD=interOP@123
+      - COUCHDB_SECRET=monday
+      - CLUSTERING=YES
+      - IPADDRESS=MASTER_IPADDRESS
+      - COUCHDBPORTNO=MASTER_COUCHDBPORT
+      - MASTERNODE=YES
+      - NODESCOUNT=3
+      - SLAVENODE_IPADDRESS1=SLAVENODE1_IPADDRESS
+      - SLAVENODE_COUCHDBPORT1=SLAVENODE1_COUCHDBPORT
+      - SLAVENODE_IPADDRESS2=SLAVENODE2_IPADDRESS
+      - SLAVENODE_COUCHDBPORT2=SLAVENODE2_COUCHDBPORT
+
+    ports:
+      - "5984:5984"
+      - "5986:5986"
+      - "4369:4369"
+      - "9100-9200:9100-9200"
+    volumes:
+      - couch-data:/opt/couchdb/data/
+
+  haproxy:
+    image: haproxy:1.7.3
+    volumes:
+      - ./haproxy:/usr/local/etc/haproxy
+    ports:
+      - "5983:5984"
